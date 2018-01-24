@@ -1,7 +1,5 @@
 package ru.medvedev;
 
-import com.sun.scenario.effect.impl.sw.java.JSWBlend_COLOR_BURNPeer;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
@@ -37,24 +35,35 @@ public class MainWindow extends JFrame {
         ePanel.setLayout(new GridLayout(4, 2, 2, 2));
 
         JButton buttonCOS = new JButton("cos");
+        buttonCOS.addActionListener(e -> {setTrigonometricFunction(1);});
         JButton buttonSIN = new JButton("sin");
+        buttonSIN.addActionListener(e -> {setTrigonometricFunction(2);});
         JButton buttonTG = new JButton("tg");
+        buttonTG.addActionListener(e -> {setTrigonometricFunction(3);});
         JButton buttonCTG = new JButton("ctg");
+        buttonCTG.addActionListener(e -> {setTrigonometricFunction(4);});
         JButton buttonLN = new JButton("ln");
-        JButton buttonSQR = new JButton("x^y");
+        buttonLN.addActionListener(e -> {setTrigonometricFunction(5);});
+        JButton buttonSQR = new JButton("x^2");
+        buttonSQR.addActionListener(e -> {setTrigonometricFunction(6);});
         JButton buttonPM = new JButton("±");
-        JButton buttonBackspace = new JButton("<-"); //не забыть про hasDOT
-        JButton buttonC = new JButton("C"); //не забыть про hasDOT
-        JButton buttonCE = new JButton("CE"); //не забыть про hasDOT
+        buttonPM.addActionListener(e -> {setTrigonometricFunction(7);});
+        JButton buttonBackspace = new JButton("<-");
+        buttonBackspace.addActionListener(e -> {backSpace();});
+        JButton buttonC = new JButton("C");
+        buttonC.addActionListener(e -> {C();});
+        JButton buttonCE = new JButton("CE");
+        buttonCE.addActionListener(e -> {CE();});
+
 
         JButton buttonPLUS = new JButton("+");
-        buttonPLUS.addActionListener(e -> {setAction("+");});
+        buttonPLUS.addActionListener(e -> {setAction(1);});
         JButton buttonMINUS = new JButton("-");
-        buttonPLUS.addActionListener(e -> {setAction("-");});
+        buttonMINUS.addActionListener(e -> {setAction(2);});
         JButton buttonDIVIDE = new JButton("/");
-        buttonPLUS.addActionListener(e -> {setAction("/");});
+        buttonDIVIDE.addActionListener(e -> {setAction(3);});
         JButton buttonX = new JButton("*");
-        buttonPLUS.addActionListener(e -> {setAction("*");});
+        buttonX.addActionListener(e -> {setAction(4);});
 
 
         JButton n1 = new JButton("1");
@@ -77,8 +86,10 @@ public class MainWindow extends JFrame {
         n9.addActionListener(e -> {addNumeral(9.0);});
         JButton n0 = new JButton("0");
         n0.addActionListener(e -> {addNumeral(0.0);});
-        JButton buttonDOT = new JButton("."); //не забыть про hasDOT
+        JButton buttonDOT = new JButton(".");
+        buttonDOT.addActionListener(e -> {setDOT();});
         JButton buttonEQUALLY = new JButton("=");
+        buttonEQUALLY.addActionListener(e -> {setResult(firstN,action, secondN);});
 
         cPanel.add(n1);
         cPanel.add(n2);
@@ -116,20 +127,23 @@ public class MainWindow extends JFrame {
         add(display, BorderLayout.NORTH);
     }
 
-    public void setDisplay(Double first, String action, Double second) {
+    public void setDisplay(Double first, String action2, Double second) {
         String r = "";
 
-        if(first == null && action == null && second == null) {
+        if(first == null && action2 == null && second == null) {
             r = "0";
-        } else  if (first != null) {
+        }
+        if (first != null) {
             if (Objects.equals(first.toString().substring(first.toString().length() - 2), ".0")) {
                 r = first.toString().substring(0, first.toString().length()-2);
             } else {
                 r = first.toString();
             }
-        } else if (action != null) {
-            r = r+" "+action;
-        } else if (second != 0) {
+        }
+        if (action2 != null) {
+            r = r+" "+action2;
+        }
+        if (second != null) {
             if (Objects.equals(second.toString().substring(second.toString().length() - 2), ".0")) {
                 r = r+" "+second.toString().substring(0, second.toString().length()-2);
             } else {
@@ -167,26 +181,167 @@ public class MainWindow extends JFrame {
         setDisplay(firstN, action, secondN);
     }
 
-    //НЕ РАБОТАЕТ :(
-    public void setAction(String selaction) {
-        System.out.println(firstN +" "+ action +" "+ secondN);
+    public void setAction(int selaction) {
         if(Objects.equals(action, null)) {
             hasDOT = false;
-            if (Objects.equals(selaction, "+")) {
+            if (selaction == 1) {
                 action = "+";
-            } else if (Objects.equals(selaction, "-")){
+            } else if (selaction == 2){
                 action = "-";
-            } else if (Objects.equals(selaction, "/")) {
+            } else if (selaction == 3) {
                 action = "/";
-            } else if (Objects.equals(selaction, "*")) {
+            } else if (selaction == 4) {
                 action = "*";
             }
+            System.out.println(firstN +" "+ action +" "+ secondN);
             setDisplay(firstN, action, secondN);
         } else {
-            //setResult();
-            //setAction(selaction);
+            setResult(firstN, action, secondN);
+            setAction(selaction);
         }
     }
 
+    public void setResult(Double first, String action2, Double second) {
+        Double result;
 
+        if (first != null & action2 != null && second != null){
+            hasDOT = false;
+            firstN = null;
+            secondN = null;
+            action = null;
+        }
+
+        if (action2.equals("+")) {
+            result = first + second;
+            firstN = result;
+            System.out.println(first.toString()+" + "+second.toString()+" = "+ result);
+            setDisplay(result, null, null);
+        } else if (action2.equals("-")) {
+            result = first - second;
+            firstN = result;
+            System.out.println(first.toString()+" - "+second.toString()+" = "+ result);
+            setDisplay(result, null, null);
+        } else if (action2.equals("/")) {
+            result = first / second;
+            firstN = result;
+            System.out.println(first.toString()+" / "+second.toString()+" = "+ result);
+            setDisplay(result, null, null);
+        } else if (action2.equals("*")) {
+            result = first * second;
+            firstN = result;
+            System.out.println(first.toString()+" * "+second.toString()+" = "+ result);
+            setDisplay(result, null, null);
+        } else {
+            //дурак чтоле?
+        }
+    }
+
+    public void setDOT() {
+        if (hasDOT == false) {
+            hasDOT = true;
+            firstN = firstN;
+        } else {
+            hasDOT = false;
+            secondN = secondN;
+        }
+    }
+
+    public void setTrigonometricFunction(int fun) {
+        if (fun == 1) {
+            //cos
+            if (firstN != null && secondN == null){
+                firstN = Math.cos(firstN);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 2) {
+            //sin
+            if (firstN != null && secondN == null){
+                firstN = Math.sin(firstN);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 3) {
+            //tg
+            if (firstN != null && secondN == null){
+                firstN = Math.tan(firstN);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 4 ) {
+            //ctg
+            if (firstN != null && secondN == null){
+                firstN = 1.0 / Math.tan(firstN);//z=1.0 / Math.tan(x);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 5) {
+            //ln
+            if (firstN != null && secondN == null){
+                firstN = Math.log(firstN);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 6) {
+            //sqr
+            if (firstN != null && secondN == null){
+                firstN = Math.pow(firstN, 2);
+                setDisplay(firstN, action, secondN);
+            }
+        } else if (fun == 7) {
+            //inv
+            if (firstN != null && secondN == null){
+                if(firstN > 0 ){
+                    firstN = firstN - firstN - firstN;
+                } else {
+                    firstN = firstN * (-1);
+                }
+                setDisplay(firstN, action, secondN);
+            } else {
+                if(secondN > 0 ){
+                    secondN = secondN - secondN - secondN;
+                } else {
+                    secondN = secondN * (-1);
+                }
+                setDisplay(firstN, action, secondN);
+            }
+        }
+    }
+
+    public void CE() {
+        if (secondN == null) {
+            action = null;
+        }
+
+        if (secondN != null) {
+            secondN = null;
+        }
+
+        setDisplay(firstN, action, secondN);
+    }
+
+    public void C() {
+        hasDOT = false;
+        firstN = null;
+        secondN = null;
+        action = null;
+
+        setDisplay(firstN, action, secondN);
+    }
+
+    public void backSpace() {
+        int f = 0;
+        if (firstN != null && action==null && secondN == null) {
+            if (hasDOT == false) {
+                firstN = Double.parseDouble(firstN.toString().substring(0, firstN.toString().length()-3));
+            } else {
+                firstN = Double.parseDouble(firstN.toString().substring(0, firstN.toString().length()-1));
+            }
+        } else if (firstN != null && action !=null && secondN == null) {
+            action = null;
+        } else if (firstN != null && action !=null && secondN != null) {
+            if (hasDOT == false) {
+                secondN = Double.parseDouble(secondN.toString().substring(0, secondN.toString().length()-3));
+            } else {
+                secondN = Double.parseDouble(secondN.toString().substring(0, secondN.toString().length()-1));
+            }
+        }
+
+        setDisplay(firstN, action, secondN);
+    }
 }
